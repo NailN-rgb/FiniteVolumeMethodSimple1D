@@ -1,13 +1,19 @@
-
+import numpy as np
 # For equation 
 # dib(Gamma (grad phi)) + S_phi = 0
 
 class SteadyStateEquation:
-    Gamma = 1
-    Su = 0
-    Sp = 0
-    ua = 0
-    ub = 1
+    def Gamma(self, x):
+        return x
+    
+    def Su(self, x):
+        return 0
+    
+    def Sp(self, x):
+        return 0
+    
+    ua = -2.30
+    ub = 0.69
 
 
 def get_modified_array(x):
