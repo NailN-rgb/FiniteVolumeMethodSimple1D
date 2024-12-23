@@ -3,13 +3,24 @@ import numpy as np
 # dib(Gamma (grad phi)) + S_phi = 0
 
 class SteadyStateEquation:
+    # 'Flow' 
     def Gamma(self, x):
         return x
     
+    # 'Clean' Source
     def Su(self, x):
         return 0
     
+    # 'Node' Source
     def Sp(self, x):
+        return 0
+    
+    # density
+    def rho(self, x):
+        return 0
+    
+    # flow field
+    def u(self, x):
         return 0
     
     ua = -2.30
