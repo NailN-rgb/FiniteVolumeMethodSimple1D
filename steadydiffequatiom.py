@@ -1,11 +1,18 @@
 import numpy as np
 # For equation 
-# dib(Gamma (grad phi)) + S_phi = 0
-
+# d/dx (pu\phi) = d/dx(Г dphi/dx)
 class SteadyStateEquation:
     # 'Flow' 
+    def analytical_solution(self, x):
+        res = []
+        for point in x:
+            res.append(-(np.exp((self.rho(point) * self.u(point) * point) / self.Gamma(point)) - 1) / \
+                        (np.exp((self.rho(point) * self.u(point))/self.Gamma(point)) - 1) + 1)
+        
+        return res
+
     def Gamma(self, x):
-        return x
+        return 0.1
     
     # 'Clean' Source
     def Su(self, x):
@@ -17,14 +24,14 @@ class SteadyStateEquation:
     
     # density
     def rho(self, x):
-        return 0
+        return 1
     
     # flow field
     def u(self, x):
-        return 0
+        return -2.5
     
-    ua = -2.30
-    ub = 0.69
+    ua = 1
+    ub = 0
 
 
 def get_modified_array(x):
