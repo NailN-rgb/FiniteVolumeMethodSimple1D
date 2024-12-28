@@ -2,8 +2,36 @@
 import numpy as np
 
 # flux limiter function
+def van_leer_limiter(r):
+    return (r + abs(r)) / (1 + r)
+
+
+def van_albada_limiter(r):
+    return (r + pow(r,2)) / (1 + pow(r,2))
+
+
 def quick_limiter(r):
     return max(0, min(2 * r, (3 + r) / 4, 2))
+
+
+def min_mood_limiter(r):
+    return min(r, 1) if r > 0 else 0
+
+
+def superbee_limiter(r):
+    return max(0, min(2 * r, 1), min(r, 2))
+
+
+def sweby_limiter(r):
+    beta = 1
+    return max(0, min(beta * r, 1), min(r, beta))
+
+def umsit_limiter(r):
+    return max(
+        0, 
+        min(2 * r, (3 + r)/4, 2, (1 + 3 * r) / 4, 2)
+    )
+
 
 def init_phi(N):
     phi = []
@@ -18,6 +46,8 @@ def init_phi(N):
 def TVD_Scheme(N, x, equation, tol = 1e-4, tvd_limit = 10):
     A = np.zeros((N , N))
     F = np.zeros(N)
+
+    limiter = umsit_limiter
 
     # phi arrays for iteration process
     [phi, phinew] = init_phi(N)
@@ -64,8 +94,8 @@ def TVD_Scheme(N, x, equation, tol = 1e-4, tvd_limit = 10):
             A[i, i + 1] = -(De + max(-Fe, 0))
             A[i, i] = Dw + max(Fw, 0) + De + max(-Fe, 0) + (Fe - Fw)
 
-            F[i] = 1/2 * Fe * ((1 - alphae) * quick_limiter(reminus) - alphae * quick_limiter(replus)) * (phi[i + 1] - phi[i]) + \
-                            1/2 * Fw * (alphaw * quick_limiter(rwplus) - (1 - alphaw) * quick_limiter(rwminus)) * (phi[i] - phi[i - 1])
+            F[i] = 1/2 * Fe * ((1 - alphae) * limiter(reminus) - alphae * limiter(replus)) * (phi[i + 1] - phi[i]) + \
+                            1/2 * Fw * (alphaw * limiter(rwplus) - (1 - alphaw) * limiter(rwminus)) * (phi[i] - phi[i - 1])
 
         # Boundary nodes
         # Node A
@@ -77,7 +107,7 @@ def TVD_Scheme(N, x, equation, tol = 1e-4, tvd_limit = 10):
 
         A[0, 0] = D1 + Da + F1
         A[0, 1] = -D1
-        F[0]    = (Da + Fa) * equation.ua - 1/2 * Fe * quick_limiter(r1) * (phi[1] - phi[0])
+        F[0]    = (Da + Fa) * equation.ua - 1/2 * Fe * limiter(r1) * (phi[1] - phi[0])
 
         # Node N
         Dn = equation.Gamma(x[-2]) / (x[-1] - x[-2])
@@ -88,7 +118,7 @@ def TVD_Scheme(N, x, equation, tol = 1e-4, tvd_limit = 10):
 
         A[N - 1, N - 1] = Dn + Db
         A[N - 1, N - 2] = -Fn - Dn 
-        F[N - 1]        = (Db - Fb) * equation.ub + 1/2 * Fn * quick_limiter(rn) * (phi[-1] - phi[-2])
+        F[N - 1]        = (Db - Fb) * equation.ub + 1/2 * Fn * limiter(rn) * (phi[-1] - phi[-2])
 
         phinew = np.linalg.solve(A,F)
 

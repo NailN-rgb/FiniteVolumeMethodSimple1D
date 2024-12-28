@@ -16,7 +16,7 @@ equation: SteadyStateEquation = SteadyStateEquation()
 a: float = 0
 b: float = 1
 # Nodes count
-N: float = 100
+N: float = 20
 
 x = np.linspace(a, b, N)
 
